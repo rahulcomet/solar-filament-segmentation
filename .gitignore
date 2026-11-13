@@ -3,6 +3,8 @@ __pycache__/
 .ultralytics/
 .matplotlib/
 data/
-weights/*.pt
 submission*.csv
-report/review-*.png
+weights/*
+!weights/detector.pt
+!weights/refiner.pt
+/report/
