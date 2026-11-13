@@ -1,0 +1,18 @@
+{
+  "file": "submission_yolo11s_pass6_boundary_vote.csv",
+  "sha256": "ca9569bd900baf29296d1d1ad03f5e95deeeb6d20a3773d1240fcf4e1bf2ad3f",
+  "variant": "boundary-vote",
+  "local_validation_pq": 0.46337363003160587,
+  "test_images_verified_and_processed": 180,
+  "prediction_rows": 1187,
+  "images_without_detections": [
+    "20180507140210Th",
+    "20200310113230Ch",
+    "20211214174010Mh"
+  ],
+  "same_instance_ids_as_mirror": true,
+  "masks_changed_vs_mirror": 971,
+  "images_changed_vs_mirror": 176,
+  "canonical_rle": true,
+  "disjoint": true
+}

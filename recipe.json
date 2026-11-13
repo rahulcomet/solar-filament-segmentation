@@ -1,0 +1,33 @@
+{
+  "detector": {
+    "path": "weights/detector.pt",
+    "sha256": "81ea9b4d2761722773710fbe68dc53eb060964e253e151d52340c1cd44ba7c43",
+    "architecture": "YOLO11s-seg",
+    "epoch": 26,
+    "inference": {
+      "imgsz": 2048,
+      "conf": 0.2,
+      "iou": 0.7,
+      "max_det": 100,
+      "retina_masks": true
+    }
+  },
+  "refiner": {
+    "path": "weights/refiner.pt",
+    "sha256": "c9a765f673ddd56021d776660eff083307c7e923233a5abf6a07cd7c93c6a6c2",
+    "epoch": 6,
+    "architecture": "Basic scratch ResNet34 U-Net / GroupNorm",
+    "input_mode": "image",
+    "canvas": 512,
+    "crop_padding": 32,
+    "threshold": 0.55,
+    "empty_policy": "retain_original"
+  },
+  "validation": {
+    "tp": 976,
+    "fp": 413,
+    "fn": 546,
+    "iou_sum": 667.0889430099852,
+    "pq": 0.4583228739333461
+  }
+}

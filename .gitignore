@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+.ultralytics/
+.matplotlib/
+data/
+weights/*.pt
+submission*.csv
+report/review-*.png
