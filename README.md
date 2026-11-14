@@ -1,26 +1,33 @@
 # Solar filament instance segmentation
 
-This solution uses YOLO11s-seg and a mask-guided U-Net to segment individual filaments in GONG H-alpha images. The selected recipe uses the original 2048 view, a horizontally flipped 2048 view, and the same unflipped image upscaled to 2560 for the detector. A two-of-three pixel vote adjusts matching instance boundaries while preserving disjoint masks.
+This is the three-view boundary-voting entry for the [Solar Filament Segmentation Challenge 2026](https://www.kaggle.com/competitions/filament-segmentation-2026). It scored **0.37 public Kaggle PQ** and **0.463374 local PQ** on 146 held-out images with 234 annotation records. Local validation was split by observation day.
 
-| Recipe | Local PQ | TP | FP | FN | Public Kaggle PQ |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| Original view | 0.458323 | 976 | 413 | 546 | 0.37 |
-| Mirror admissions | 0.459652 | 990 | 430 | 532 | 0.37 |
-| **Three-view boundary vote** | **0.463374** | **994** | **426** | **528** | **0.37** |
-| Vote with additional isolated admissions | 0.465434 | 1013 | 446 | 509 | 0.37 |
+YOLO11s-seg proposes masks from the native 2048 × 2048 image, a horizontally flipped copy, and the unflipped image upscaled to 2560 × 2560. A mask-guided U-Net refines each proposal on the original image. Matched masks vote on boundary pixels, and the exporter checks that final instances do not overlap.
 
-Local PQ uses 146 physical images and 234 separate annotation records held out by observation day. Kaggle listed the three-view boundary vote first in the submissions view on November 14. The displayed scores do not reveal unrounded differences.
+## Reproduce the submitted CSV
 
-## Reproduce the selected CSV
+Use Python 3.11 and an NVIDIA GPU. The pinned environment was verified on an RTX 3060 Ti with PyTorch 2.6.0 and CUDA 12.6. Both checkpoints are included in `weights/`. The runner checks their SHA-256 hashes against [`recipe.json`](recipe.json) before inference.
 
-Use Python 3.11 and an NVIDIA GPU. The pinned environment was verified with PyTorch 2.6.0 and CUDA 12.6 on an RTX 3060 Ti. Put the provided competition test images in `data/test/images`. Both trained checkpoints are included in `weights/`. The runner checks their SHA-256 hashes before inference.
+Clone the repository and run the commands from its root. Set `--images` to the competition's `test_images` folder, with the 180 H-alpha images directly inside it. The example uses `data/test/images`.
 
 ```powershell
 python -m venv .venv
-.venv/Scripts/python.exe -m pip install -r requirements.txt
-.venv/Scripts/python.exe reproduce.py --images data/test/images --output submission.csv --variant boundary-vote
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe reproduce.py --images data/test/images --output submission.csv --variant boundary-vote
 ```
 
-On Linux, use `.venv/bin/python`. The [notebook](pipeline.ipynb) runs the same path in the project environment. [Recipe](recipe.json) records checkpoint hashes and settings. [Export verification](submission-verification.json) records the original CSV hash and its 1,187 disjoint masks across the 180-image test inventory. The CSV uses one row per nonempty instance.
+On Linux, use `.venv/bin/python` in place of the Windows environment executable. The CLI requires a new output filename if `submission.csv` already exists.
 
-The technical report is a separate upload through the competition's organizer form. Voting misses some faint or fragmented filaments and may change the extent preferred by a given annotator. The project uses the [Ultralytics AGPL-3.0 distribution](https://www.ultralytics.com/license). The supplied competition images and labels are available through [Kaggle](https://www.kaggle.com/competitions/filament-segmentation-2026/data).
+To run the same pipeline interactively, open [`pipeline.ipynb`](pipeline.ipynb) from the repository root, select the `.venv` Python kernel, and set `IMAGES` to the same folder. Run the cells in order. The notebook uses the same inference and CSV export code as the CLI.
+
+## Verify the output
+
+The submitted CSV contains **1,187 instance rows** with the columns `filament_id` and `segmentation_rle`. All 180 images were processed, and three had no detections. The masks use compressed COCO RLE at 2048 × 2048. Compare the SHA-256 hash of your CSV with [`submission-verification.json`](submission-verification.json).
+
+```powershell
+Get-FileHash submission.csv -Algorithm SHA256
+```
+
+On Linux, run `sha256sum submission.csv`.
+
+The technical report is a separate upload through the organizer's form. Get the test images from the [Kaggle Data tab](https://www.kaggle.com/competitions/filament-segmentation-2026/data). See [LICENSE](LICENSE) for the code license.
